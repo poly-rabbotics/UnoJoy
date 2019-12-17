@@ -32,10 +32,10 @@ typedef struct dataForController_t
     uint8_t dpadDownOn : 1;
         uint8_t padding : 7;     // We end with 7 bytes of padding to make sure we get our data aligned in bytes
                                  
-    uint8_t leftStickX : 8;  // Each of the analog stick values can range from 0 to 255
-    uint8_t leftStickY : 8;  //  0 is fully left or up
-    uint8_t rightStickX : 8; //  255 is fully right or down 
-    uint8_t rightStickY : 8; //  128 is centered.
+    uint16_t leftStickX : 10;  // Each of the analog stick values can range from 0 to 255
+    uint16_t leftStickY : 10;  //  0 is fully left or up
+    uint16_t rightStickX : 10; //  255 is fully right or down 
+    uint16_t rightStickY : 10; //  128 is centered.
                                  // Important - analogRead(pin) returns a 10 bit value, so if you're getting strange
                                  //  results from analogRead, you may need to do (analogRead(pin) >> 2) to get good data
   } dataForController_t;
@@ -62,10 +62,10 @@ dataForController_t getBlankDataForController(void){
     controllerData.startOn = 0;
     controllerData.homeOn = 0;
     //Set the sticks to 128 - centered
-    controllerData.leftStickX = 128;
-    controllerData.leftStickY = 128;
-    controllerData.rightStickX = 128;
-    controllerData.rightStickY = 128;
+    controllerData.leftStickX = 512;
+    controllerData.leftStickY = 512;
+    controllerData.rightStickX = 512;
+    controllerData.rightStickY = 512;
     // And return the data!
     return controllerData;
 }

@@ -1,5 +1,7 @@
 #include "UnoJoy.h"
 
+int count = 0;
+
 const byte button0Pin = 2;
 const byte button1Pin = 3;
 const byte button2Pin = 4;
@@ -32,10 +34,10 @@ struct UnoOut {
   uint8_t toggle3: 1;
   uint8_t toggle4: 1;
 
-  uint8_t pot0 : 8;
-  uint8_t pot1 : 8;
-  uint8_t pot2 : 8;
-  uint8_t pot3 : 8;
+  uint16_t pot0 : 10;
+  uint16_t pot1 : 10;
+  uint16_t pot2 : 10;
+  uint16_t pot3 : 10;
 };
 struct UnoOut getBlankData() {
   UnoOut out;
@@ -59,39 +61,39 @@ struct UnoOut getBlankData() {
   
   return out;
 }
-struct UnoOut getControllerData() {
+struct UnoOut getControllerData(int count) {
   UnoOut out = getBlankData();
-  if(digitalRead(button0Pin)) {
+  if(!digitalRead(button0Pin)) {
     out.button0 = 1;
   }
-  if(digitalRead(button1Pin)) {
+  if(!digitalRead(button1Pin)) {
     out.button1 = 1;
   }
-  if(digitalRead(button2Pin)) {
+  if(!digitalRead(button2Pin)) {
     out.button2 = 1;
   }
-  if(digitalRead(button3Pin)) {
+  if(!digitalRead(button3Pin)) {
     out.button3 = 1;
   }
-  if(digitalRead(button4Pin)) {
+  if(!digitalRead(button4Pin)) {
     out.button4 = 1;
   }
-  if(digitalRead(button5Pin)) {
+  if(!digitalRead(button5Pin)) {
     out.button5 = 1;
   }
-  if(digitalRead(toggle0Pin)) {
+  if(!digitalRead(toggle0Pin)) {
     out.toggle0 = 1;
   }
-  if(digitalRead(toggle1Pin)) {
+  if(!digitalRead(toggle1Pin)) {
     out.toggle1 = 1;
   }
-  if(digitalRead(toggle2Pin)) {
+  if(!digitalRead(toggle2Pin)) {
     out.toggle2 = 1;
   }
-  if(digitalRead(toggle3Pin)) {
+  if(!digitalRead(toggle3Pin)) {
     out.toggle3 = 1;
   }
-  if(digitalRead(toggle4Pin)) {
+  if(!digitalRead(toggle4Pin)) {
     out.toggle4 = 1;
   }
   out.pot0 = analogRead(pot0Pin);
@@ -117,16 +119,15 @@ dataForController_t translate(UnoOut u) {
   d.selectOn = u.toggle4;
    
   //several other digital inputs are not used here. They are set to 0 by getBlankDataForController() above.
-  d.leftStickX = map(u.pot0, 0, 1023, 0, 255);
-  d.leftStickY = map(u.pot1, 0, 1023, 0, 255);
-  d.rightStickX = map(u.pot2, 0, 1023, 0, 255);
-  d.rightStickY = map(u.pot3, 0, 1023, 0, 255);
+  d.leftStickX = u.pot0;
+  d.leftStickY = u.pot1;
+  //d.rightStickX = u.pot2;
+  //d.rightStickY = u.pot3;
   return d;
 }
 
 void setup() 
 {
-  Serial.begin(9600);
   for(int i = 2; i < 13; i++) {
     pinMode(i, INPUT);
     digitalWrite(i, HIGH);
@@ -136,5 +137,8 @@ void setup()
 
 void loop() 
 {
-  setControllerData(translate(getControllerData()));
+  setControllerData(translate(getControllerData(count)));
+  if(millis() % 20 == 0) {
+    count++;
+  }
 }
