@@ -34,10 +34,10 @@ struct UnoOut {
   uint8_t toggle3: 1;
   uint8_t toggle4: 1;
 
-  uint16_t pot0 : 10;
-  uint16_t pot1 : 10;
-  uint16_t pot2 : 10;
-  uint16_t pot3 : 10;
+  uint8_t pot0 : 8;
+  uint8_t pot1 : 8;
+  uint8_t pot2 : 8;
+  uint8_t pot3 : 8;
 };
 struct UnoOut getBlankData() {
   UnoOut out;
@@ -54,7 +54,7 @@ struct UnoOut getBlankData() {
   out.toggle3 = 0;
   out.toggle4 = 0;
 
-  out.pot0 = 1024/2;
+  out.pot0 = 0;
   out.pot1 = out.pot0;
   out.pot2 = out.pot0;
   out.pot3 = out.pot0;
@@ -96,10 +96,10 @@ struct UnoOut getControllerData(int count) {
   if(!digitalRead(toggle4Pin)) {
     out.toggle4 = 1;
   }
-  out.pot0 = analogRead(pot0Pin);
-  out.pot1 = analogRead(pot1Pin);
-  out.pot2 = analogRead(pot2Pin);
-  out.pot3 = analogRead(pot3Pin);
+  out.pot0 = (uint8_t) (analogRead(pot0Pin) / 4);
+  out.pot1 = (uint8_t) (analogRead(pot1Pin) / 4);
+  out.pot2 = (uint8_t) (analogRead(pot2Pin) / 4);
+  out.pot3 = (uint8_t) (analogRead(pot3Pin) / 4);
   return out;
 }
 dataForController_t translate(UnoOut u) {
@@ -121,8 +121,8 @@ dataForController_t translate(UnoOut u) {
   //several other digital inputs are not used here. They are set to 0 by getBlankDataForController() above.
   d.leftStickX = u.pot0;
   d.leftStickY = u.pot1;
-  //d.rightStickX = u.pot2;
-  //d.rightStickY = u.pot3;
+  d.rightStickX = u.pot2;
+  d.rightStickY = u.pot3;
   return d;
 }
 
